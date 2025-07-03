@@ -1,13 +1,11 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, filedialog
 from models.graph_logic import cargar_grafo
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import networkx as nx
-
-CSV_PATH = "data/rutas_norte_sur.csv"
 
 class MainApp(tk.Tk):
     def __init__(self):
@@ -17,11 +15,11 @@ class MainApp(tk.Tk):
         self.geometry(f"{ancho}x{alto}")
         self.minsize(900, 450)
         self.center_window(ancho, alto)
-        self.G = cargar_grafo(CSV_PATH)
-        self.nodos = sorted(list(self.G.nodes()))
+        self.G = None  # No grafo al inicio
+        self.nodos = []
         self._crear_layout()
         self._make_responsive()
-        self.visualizar_grafo_completo()
+        # NO llamamos a self.visualizar_grafo_completo() aquí
 
     def center_window(self, ancho, alto):
         ws = self.winfo_screenwidth()
@@ -40,6 +38,9 @@ class MainApp(tk.Tk):
         # --- Lado izquierdo ---
         self.left = tk.Frame(self.container)
         self.left.grid(row=0, column=0, sticky="nsew", padx=30, pady=30)
+
+        # Botón para cargar archivo
+        ttk.Button(self.left, text="Cargar archivo CSV", command=self.cargar_archivo).pack(anchor="w", pady=(0, 18))
 
         # Título principal
         ttk.Label(self.left, text="¿Qué deseas hacer?", font=("Arial", 15, "bold")).pack(anchor="w", pady=(0, 18))
@@ -90,7 +91,7 @@ class MainApp(tk.Tk):
         self.right.grid_rowconfigure(1, weight=0)
         self.right.grid_columnconfigure(0, weight=1)
 
-        self.fig, self.ax = plt.subplots(figsize=(13, 7))  # Más horizontal
+        self.fig, self.ax = plt.subplots(figsize=(13, 7))
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.right)
         self.canvas_widget = self.canvas.get_tk_widget()
         self.canvas_widget.grid(row=0, column=0, sticky="nsew")
@@ -104,6 +105,12 @@ class MainApp(tk.Tk):
         self.columnconfigure(0, weight=1)
 
     def visualizar_grafo_completo(self):
+        if self.G is None:
+            self.ax.clear()
+            self.ax.set_title("Carga un archivo CSV para visualizar el grafo", fontsize=16)
+            self.ax.axis('off')
+            self.canvas.draw()
+            return
         self.ax.clear()
         pos = nx.kamada_kawai_layout(self.G, scale=3)
         nx.draw_networkx_nodes(self.G, pos, ax=self.ax, node_color='skyblue', node_size=650)
@@ -121,10 +128,27 @@ class MainApp(tk.Tk):
         self.fig.tight_layout()
         self.canvas.draw()
 
+    def cargar_archivo(self):
+        file_path = filedialog.askopenfilename(
+            title="Selecciona el archivo CSV de rutas",
+            filetypes=[("CSV files", "*.csv")]
+        )
+        if file_path:
+            try:
+                self.G = cargar_grafo(file_path)
+                self.nodos = sorted(list(self.G.nodes()))
+                self.visualizar_grafo_completo()
+                messagebox.showinfo("Éxito", "Archivo cargado correctamente.")
+            except Exception as e:
+                messagebox.showerror("Error", f"No se pudo cargar el archivo.\n\n{e}")
+
     def ir_corto(self):
         alg = self.algoritmos_corto.get()
         if alg != "Dijkstra":
             messagebox.showinfo("En desarrollo", f"La funcionalidad '{alg}' estará disponible próximamente.")
+            return
+        if self.G is None:
+            messagebox.showwarning("Archivo no cargado", "Por favor, carga un archivo CSV primero.")
             return
         self.destroy()
         import app.gui_dijkstra as djk
@@ -136,4 +160,5 @@ class MainApp(tk.Tk):
 
 if __name__ == "__main__":
     app = MainApp()
+    app.visualizar_grafo_completo()  # Muestra mensaje inicial "Carga un archivo CSV..."
     app.mainloop()

@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from models.graph_logic import cargar_grafo, calcular_todos_caminos_dijkstra
+from models.graph_logic import calcular_todos_caminos_dijkstra
 
 import matplotlib
 matplotlib.use('TkAgg')
@@ -8,24 +8,20 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import networkx as nx
 
-CSV_PATH = "data/rutas_norte_sur.csv"
-
 class GrafoDijkstraApp(tk.Tk):
-    def __init__(self):
+    def __init__(self, G, nodos):
         super().__init__()
         self.title("Dijkstra: caminos más cortos desde un origen")
-        # --- Ajusta el tamaño de la ventana aquí ---
         ancho, alto = 1400, 750
         self.geometry(f"{ancho}x{alto}")
         self.minsize(900, 450)
         self.center_window(ancho, alto)
-        self.G = cargar_grafo(CSV_PATH)
-        self.nodos = sorted(list(self.G.nodes()))
+        self.G = G
+        self.nodos = nodos
         self._crear_layout()
         self._make_responsive()
 
     def center_window(self, ancho, alto):
-        # Obtén el tamaño de la pantalla
         ws = self.winfo_screenwidth()
         hs = self.winfo_screenheight()
         x = (ws // 2) - (ancho // 2)
@@ -36,16 +32,14 @@ class GrafoDijkstraApp(tk.Tk):
         self.container = tk.Frame(self)
         self.container.pack(fill=tk.BOTH, expand=True)
 
-        # --- Fila 0: Botón atrás ---
         self.container.grid_rowconfigure(0, weight=0)
         self.container.grid_rowconfigure(1, weight=1)
         self.container.grid_columnconfigure(0, weight=1)
-        self.container.grid_columnconfigure(1, weight=2) # haz el derecho más grande
+        self.container.grid_columnconfigure(1, weight=2)
 
         self.boton_atras = ttk.Button(self.container, text="← Atrás", command=self.volver_a_main)
         self.boton_atras.grid(row=0, column=0, sticky="nw", padx=10, pady=8, columnspan=2)
 
-        # --- Fila 1: Paneles izquierdo y derecho ---
         self.left = tk.Frame(self.container)
         self.left.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
         ttk.Label(self.left, text="Selecciona Origen:").pack(pady=(20,5), fill=tk.X)
@@ -61,7 +55,7 @@ class GrafoDijkstraApp(tk.Tk):
         self.right.grid_rowconfigure(1, weight=0)
         self.right.grid_columnconfigure(0, weight=1)
 
-        self.fig, self.ax = plt.subplots(figsize=(13, 7)) # Más horizontal
+        self.fig, self.ax = plt.subplots(figsize=(13, 7))
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.right)
         self.canvas_widget = self.canvas.get_tk_widget()
         self.canvas_widget.grid(row=0, column=0, sticky="nsew")
@@ -133,5 +127,8 @@ class GrafoDijkstraApp(tk.Tk):
         MainApp().mainloop()
 
 if __name__ == "__main__":
-    app = GrafoDijkstraApp()
+    import networkx as nx
+    G = nx.Graph()
+    nodos = []
+    app = GrafoDijkstraApp(G, nodos)
     app.mainloop()

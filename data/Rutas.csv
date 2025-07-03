@@ -1,0 +1,101 @@
+origen;destino;distancia(km);ETA(min) 
+cantagallo;san pablo;12;15
+san pablo;simití;76.9;101
+san pablo;santa rosa del sur;89.8;117
+montecristo;tiquisio;71.2;140
+tiquisio;norosí;31.3;59
+norosí;arenal;16.9;33
+tiquisio;río viejo;56.9;100
+norosí;río viejo;41.3;71
+arenal;río viejo;27.7;48
+arenal;altos del rosario;86.4;158
+norosí;altos del rosario;81.7;153
+norosí;altos del rosario;72.7;155
+arenal;san martín de loba;97.2;179
+norosí;san martín de loba;83.5;176
+arenal;barranco de loba;85.2;115
+norosí;barranco de loba;71.5;152
+río viejo;regidor;11.5;16
+regidor;el peñon;47;95
+tiquisio;altos del rosario;88.3;181
+tiquisio;altos del rosario;97.4;184
+tiquisio;san martín de loba;99.1;204
+tiquisio;barranco de loba;87.1;181
+barranco de loba;san martín de loba;9.5;16
+río viejo;san martín de loba;73.8;139
+río viejo;barranco de loba;61.9;116
+río viejo;altos del rosario;63.1;119
+altos del rosario;barranco de loba;27.2;53
+barranco de loba;hatillo de loba;5.8;13
+san martín de loba;hatillo de loba;5.7;13
+san jacinto del cauca;achí;52.6;105
+simití;morales;50.3;75
+simití;santa rosa del sur;18.5;27
+hatillo de loba;margarita;42.8;52
+margarita;san fernando;11.3;12
+achí;montecristo;41.8;96
+morales;arenal ;35.3;66
+morales;río viejo;49.1;91
+pinillos;barranco de loba;58.7;107
+pinillos;altos del rosario;47.4;86
+achí;pinillos;56;107
+san fernando;mompós;13.1;18
+pinillos;magangué;56.4;103
+magangué;cicuco;22.1;27
+cicuco;talaigua nuevo;9.3;13
+talaigua nuevo;mompós;25.5;38
+magangué;córdoba;69.8;117
+cartagena;clemencia;41.5;57
+cartagena;clemencia;29.8;39
+cartagena;santa rosa;15.6;28
+cartagena;santa rosa;20.2;35
+cartagena;turbaco;10.9;20
+cartagena;turbaco;14.3;24
+cartagena;turbana;21.4;33
+cartagena;turbana;23.1;33
+cartagena;santa catalina;76.3;82
+clemencia;santa catalina;5.9;8
+clemencia;santa rosa;25.4;34
+clemencia;villanueva;19.7;49
+santa rosa;villanueva;12;18
+santa rosa;turbaco;24.1;39
+turbaco;villanueva;25;41
+turbaco;turbana;9.9;18
+turbaco;turbana;10.6;18
+turbaco;arjona;13.3;16
+arjona;turbana;18.5;25
+arjona;turbana;31.3;34
+arjona;san estaninlao;32.5;53
+villanueva;san estaninlao;17;24
+villanueva;san estaninlao;40.3;63
+santa rosa;san estaninlao;39.7;60
+santa rosa;arjona;54.5;86
+turbana;maria la baja;59;67
+arjona;maria la baja;43.5;55
+turbana;mahates;50.8;56
+arjona;mahates;35.3;44
+soplaviento;san cristobal;13.8;20
+maria la baja;mahates;38.4;47
+soplaviento;arroyohondo;30;45
+san cristobal;arroyohondo;25;41
+mahates;arroyohondo;21.7;27
+arroyohondo;calamar;15.8;18
+soplaviento;mahates;20.7;25
+san cristobal;calamar;30.8;54
+san cristobal;soplaviento;12.2;17
+arjona;san juan nepo;59.3;69
+arjona;el guamo;70.3;86
+maria la baja;san juan nepo;62.4;71
+mahates;san juan nepo;47.9;54
+calamar;el guamo;31.2;54
+calamar;el guamo;53.6;60
+calamar;san juan nepo;42.5;43
+san jacinto;el carmen de bolivar;14.3;19
+san juan nepo;san jacinto;15;20
+el guamo;san juan nepo;19.8;30
+el carmen de bolivar;zambrano;40.1;61
+zambrano;córdoba;22.3;31
+el carmen de bolivar;córdoba;52.2;77
+mahates;el guamo;56.4;83
+mahates;el guamo;58.9;76
+magangué;el carmen de bolivar;106;121

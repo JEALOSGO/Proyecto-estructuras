@@ -19,7 +19,6 @@ class MainApp(tk.Tk):
         self.nodos = []
         self._crear_layout()
         self._make_responsive()
-        # NO llamamos a self.visualizar_grafo_completo() aquí
 
     def center_window(self, ancho, alto):
         ws = self.winfo_screenwidth()
@@ -152,7 +151,8 @@ class MainApp(tk.Tk):
             return
         self.destroy()
         import app.gui_dijkstra as djk
-        djk.GrafoDijkstraApp().mainloop()
+        # ---- ¡AQUÍ! ----
+        djk.GrafoDijkstraApp(self.G, self.nodos).mainloop()
 
     def ir_flujo(self):
         alg = self.algoritmos_flujo.get()

@@ -13,13 +13,22 @@ class MainApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Visualización y Algoritmos de Rutas")
-        self.geometry("1100x650")
-        self.minsize(700, 400)
+        ancho, alto = 1400, 750
+        self.geometry(f"{ancho}x{alto}")
+        self.minsize(900, 450)
+        self.center_window(ancho, alto)
         self.G = cargar_grafo(CSV_PATH)
         self.nodos = sorted(list(self.G.nodes()))
         self._crear_layout()
         self._make_responsive()
         self.visualizar_grafo_completo()
+
+    def center_window(self, ancho, alto):
+        ws = self.winfo_screenwidth()
+        hs = self.winfo_screenheight()
+        x = (ws // 2) - (ancho // 2)
+        y = (hs // 2) - (alto // 2)
+        self.geometry(f'{ancho}x{alto}+{x}+{y}')
 
     def _crear_layout(self):
         self.container = tk.Frame(self)
@@ -62,7 +71,7 @@ class MainApp(tk.Tk):
         self.right.grid_rowconfigure(1, weight=0)
         self.right.grid_columnconfigure(0, weight=1)
 
-        self.fig, self.ax = plt.subplots(figsize=(11, 7))
+        self.fig, self.ax = plt.subplots(figsize=(13, 7))  # Más horizontal
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.right)
         self.canvas_widget = self.canvas.get_tk_widget()
         self.canvas_widget.grid(row=0, column=0, sticky="nsew")
@@ -94,7 +103,6 @@ class MainApp(tk.Tk):
         self.canvas.draw()
 
     def ir_corto(self):
-        # Solo una opción por ahora, pero puedes leer: self.algoritmos_corto.get()
         self.destroy()
         import app.gui_dijkstra as djk
         djk.GrafoDijkstraApp().mainloop()

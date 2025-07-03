@@ -1,5 +1,6 @@
 import pandas as pd
 import networkx as nx
+from algorithms.dijkstra import shortest_path_dijkstra
 
 def cargar_grafo(csv_path):
     df = pd.read_csv(csv_path, sep=';', encoding='latin1')
@@ -20,3 +21,7 @@ def info_nodos(G):
         vecinos = list(G.neighbors(nodo))
         print(f"→ {nodo} | Grado: {G.degree[nodo]} | Vecinos: {vecinos}")
     print(f"\nCantidad total de nodos: {G.number_of_nodes()}")
+
+def calcular_camino_mas_corto(G, origen, destino):
+    return shortest_path_dijkstra(G, origen, destino)
+

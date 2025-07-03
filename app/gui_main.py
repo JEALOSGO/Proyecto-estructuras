@@ -49,7 +49,17 @@ class MainApp(tk.Tk):
         frame_corto = tk.Frame(self.left)
         frame_corto.pack(anchor="w", pady=(0, 18))
         ttk.Label(frame_corto, text="Algoritmo", font=("Arial", 10)).grid(row=0, column=0, padx=(0,6), pady=2)
-        self.algoritmos_corto = ttk.Combobox(frame_corto, values=["Dijkstra"], state="readonly")
+        self.algoritmos_corto = ttk.Combobox(
+            frame_corto,
+            values=[
+                "Dijkstra",
+                "Bellman-Ford",
+                "A* (A-Star)",
+                "Floyd-Warshall",
+                "Johnson"
+            ],
+            state="readonly"
+        )
         self.algoritmos_corto.current(0)
         self.algoritmos_corto.grid(row=0, column=1, padx=(0,12))
         ttk.Button(frame_corto, text="Continuar", command=self.ir_corto).grid(row=0, column=2)
@@ -59,7 +69,16 @@ class MainApp(tk.Tk):
         frame_flujo = tk.Frame(self.left)
         frame_flujo.pack(anchor="w", pady=(0, 18))
         ttk.Label(frame_flujo, text="Algoritmo", font=("Arial", 10)).grid(row=0, column=0, padx=(0,6), pady=2)
-        self.algoritmos_flujo = ttk.Combobox(frame_flujo, values=["(Próximamente)"], state="readonly")
+        self.algoritmos_flujo = ttk.Combobox(
+            frame_flujo,
+            values=[
+                "Ford-Fulkerson",
+                "Edmonds-Karp",
+                "Dinic",
+                "Push-Relabel"
+            ],
+            state="readonly"
+        )
         self.algoritmos_flujo.current(0)
         self.algoritmos_flujo.grid(row=0, column=1, padx=(0,12))
         ttk.Button(frame_flujo, text="Continuar", command=self.ir_flujo).grid(row=0, column=2)
@@ -103,12 +122,17 @@ class MainApp(tk.Tk):
         self.canvas.draw()
 
     def ir_corto(self):
+        alg = self.algoritmos_corto.get()
+        if alg != "Dijkstra":
+            messagebox.showinfo("En desarrollo", f"La funcionalidad '{alg}' estará disponible próximamente.")
+            return
         self.destroy()
         import app.gui_dijkstra as djk
         djk.GrafoDijkstraApp().mainloop()
 
     def ir_flujo(self):
-        messagebox.showinfo("En desarrollo", "La funcionalidad de Flujo máximo estará disponible próximamente.")
+        alg = self.algoritmos_flujo.get()
+        messagebox.showinfo("En desarrollo", f"La funcionalidad '{alg}' estará disponible próximamente.")
 
 if __name__ == "__main__":
     app = MainApp()

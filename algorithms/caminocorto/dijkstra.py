@@ -25,3 +25,5 @@ def shortest_paths_from_source_dijkstra(G, origen):
     except Exception as e:
         print(e)
         return {}, {}, {}, "Dijkstra"
+
+    

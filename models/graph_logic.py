@@ -2,7 +2,7 @@ import pandas as pd
 import networkx as nx
 from algorithms.caminocorto.dijkstra import shortest_path_dijkstra, shortest_paths_from_source_dijkstra
 
-# Diccionario de coordenadas (completo, revisa si te falta algún municipio)
+# Diccionario de coordenadas
 COORDS = {
     "Cartagena": (10.4236, -75.5253),
     "Santa Rosa": (10.3137, -75.3681),
@@ -73,7 +73,16 @@ def cargar_grafo(csv_path):
         destino = normaliza(row['destino'])
         distancia = float(row['distancia(km)'])
         eta = float(row['ETA(min)'])
-        G.add_edge(origen, destino, distancia=distancia, eta=eta)
+        
+        # Soporte para 'flujo (und)' si existe la columna
+        if 'flujo (und)' in df.columns:
+            try:
+                flujo = float(row['flujo (und)'])
+            except Exception:
+                flujo = None
+            G.add_edge(origen, destino, distancia=distancia, eta=eta, flujo=flujo)
+        else:
+            G.add_edge(origen, destino, distancia=distancia, eta=eta)
     # Asignar coordenadas a los nodos
     for n in G.nodes:
         nodo = normaliza(n)
@@ -84,5 +93,16 @@ def cargar_grafo(csv_path):
             G.nodes[n]['pos'] = (0, 0)
     return G
 
-def calcular_todos_caminos_dijkstra(G, origen):
+def info_nodos(G):
+    print("NODOS EN EL GRAFO:")
+    for nodo in G.nodes():
+        vecinos = list(G.neighbors(nodo))
+        print(f"→ {nodo} | Grado: {G.degree[nodo]} | Vecinos: {vecinos}")
+    print(f"\nCantidad total de nodos: {G.number_of_nodes()}")
+
+def calcular_camino_mas_corto(G, origen, destino):
+    return shortest_path_dijkstra(G, origen, destino)
+
+def calcular_caminos_a_todos(G, origen):
     return shortest_paths_from_source_dijkstra(G, origen)
+

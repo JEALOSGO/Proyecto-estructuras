@@ -1,14 +1,14 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from models.graph_logic import cargar_grafo, calcular_camino_mas_corto
+from models.graph_logic import cargar_grafo, calcular_caminos_a_todos
 
 CSV_PATH = "data/rutas_norte_sur.csv"
 
 class GrafoApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Rutas entre Municipios de Bolívar - Camino más corto (Dijkstra)")
-        self.geometry("600x300")
+        self.title("Rutas entre Municipios de Bolívar - Dijkstra (Todos los caminos)")
+        self.geometry("950x430")
         self.resizable(False, False)
         self.G = cargar_grafo(CSV_PATH)
         self.nodos = sorted(list(self.G.nodes()))
@@ -19,40 +19,38 @@ class GrafoApp(tk.Tk):
         self.combo_origen = ttk.Combobox(self, values=self.nodos, state="readonly")
         self.combo_origen.pack()
 
-        ttk.Label(self, text="Selecciona Destino:").pack(pady=(15,5))
-        self.combo_destino = ttk.Combobox(self, values=self.nodos, state="readonly")
-        self.combo_destino.pack()
+        ttk.Button(self, text="Calcular caminos más cortos a todos (Dijkstra)", command=self.mostrar_todos_caminos).pack(pady=20)
 
-        ttk.Button(self, text="Calcular camino más corto (Dijkstra)", command=self.mostrar_camino).pack(pady=20)
+        # Treeview para resultados tabulados
+        columns = ("Destino", "Camino", "Distancia (km)", "Tiempo (min)")
+        self.tabla = ttk.Treeview(self, columns=columns, show='headings', height=15)
+        for col in columns:
+            self.tabla.heading(col, text=col)
+            self.tabla.column(col, width=200 if col=="Camino" else 120, anchor="center")
+        self.tabla.pack()
 
-        self.resultado = tk.Text(self, height=6, width=70, state="disabled")
-        self.resultado.pack()
-
-    def mostrar_camino(self):
+    def mostrar_todos_caminos(self):
         origen = self.combo_origen.get()
-        destino = self.combo_destino.get()
-        if not origen or not destino:
-            messagebox.showwarning("Advertencia", "Debes seleccionar ambos nodos.")
-            return
-        if origen == destino:
-            messagebox.showinfo("Info", "El origen y destino son el mismo.")
+        if not origen:
+            messagebox.showwarning("Advertencia", "Debes seleccionar un nodo de origen.")
             return
 
-        path, distancia, tiempo = calcular_camino_mas_corto(self.G, origen, destino)
-        self.resultado.configure(state="normal")
-        self.resultado.delete(1.0, tk.END)
-        if path:
-            texto = (
-                "Algoritmo seleccionado: Dijkstra\n"
-                f"Camino más corto de {origen} a {destino}:\n"
-                + " → ".join(path) +
-                f"\nDistancia total: {distancia:.1f} km\n"
-                f"Tiempo estimado total: {tiempo:.1f} min"
-            )
-        else:
-            texto = f"No existe un camino entre {origen} y {destino}."
-        self.resultado.insert(tk.END, texto)
-        self.resultado.configure(state="disabled")
+        distancias, caminos, tiempos, algoritmo = calcular_caminos_a_todos(self.G, origen)
+
+        # Limpiar tabla
+        for row in self.tabla.get_children():
+            self.tabla.delete(row)
+
+        for destino in sorted(self.G.nodes()):
+            if destino == origen:
+                continue
+            if destino in caminos:
+                camino_str = " → ".join(caminos[destino])
+                distancia = distancias[destino]
+                tiempo = tiempos[destino]
+                self.tabla.insert("", "end", values=(destino, camino_str, f"{distancia:.1f}", f"{tiempo:.1f}"))
+            else:
+                self.tabla.insert("", "end", values=(destino, "No hay camino", "---", "---"))
 
 if __name__ == "__main__":
     app = GrafoApp()

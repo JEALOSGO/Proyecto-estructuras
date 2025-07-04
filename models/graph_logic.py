@@ -1,6 +1,10 @@
 import pandas as pd
 import networkx as nx
 from algorithms.caminocorto.dijkstra import shortest_path_dijkstra, shortest_paths_from_source_dijkstra
+from algorithms.caminocorto.bellman_ford import shortest_paths_from_source_bellman
+
+from algorithms.caminocorto.astar import shortest_path_astar
+
 
 COORDS = {
     "Cartagena": (10.4236, -75.5253),
@@ -154,3 +158,11 @@ def calcular_camino_mas_corto(G, origen, destino):
 def calcular_caminos_a_todos(G, origen):
     return shortest_paths_from_source_dijkstra(G, origen)
 
+def calcular_todos_caminos_bellman(G, origen):
+
+    return shortest_paths_from_source_bellman(G, origen)
+
+def calcular_camino_astar(G, origen, destino):
+    return shortest_path_astar(G, origen, destino)
+
+    return shortest_paths_from_source_bellman(G, origen)

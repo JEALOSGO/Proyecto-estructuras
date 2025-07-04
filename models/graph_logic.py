@@ -2,7 +2,6 @@ import pandas as pd
 import networkx as nx
 from algorithms.caminocorto.dijkstra import shortest_path_dijkstra, shortest_paths_from_source_dijkstra
 
-# Diccionario de coordenadas
 COORDS = {
     "Cartagena": (10.4236, -75.5253),
     "Santa Rosa": (10.3137, -75.3681),
@@ -60,39 +59,88 @@ def normaliza(nombre):
     return n
 
 def cargar_grafo(csv_path):
-    # Soporte automático para punto y coma o tabulación como separador
+    df = pd.read_csv(csv_path, sep=None, engine='python', encoding='latin1')
+    G = nx.Graph()
+    for _, row in df.iterrows():
+        origen = str(row['origen']).strip().title()
+        destino = str(row['destino']).strip().title()
+        distancia = float(row['distancia(km)'])
+        eta = float(row['ETA(min)'])
+        if 'flujo (und)' in df.columns:
+            flujo = float(row['flujo (und)'])
+            G.add_edge(origen, destino, distancia=distancia, eta=eta, flujo=flujo)
+        else:
+            G.add_edge(origen, destino, distancia=distancia, eta=eta)
+    # --- ASIGNAR COORDENADAS ---
+    for n in G.nodes:
+        nodo = normaliza(n)
+        found = False
+        for k in COORDS:
+            if normaliza(k) == nodo:
+                G.nodes[n]['pos'] = COORDS[k]
+                found = True
+                break
+        if not found:
+            G.nodes[n]['pos'] = (0, 0)
+    return G
+
+
+def cargar_grafo_caminos(csv_path):
     with open(csv_path, encoding='latin1') as f:
         primer_linea = f.readline()
         sep = '\t' if '\t' in primer_linea else ';'
     df = pd.read_csv(csv_path, sep=sep, encoding='latin1')
     df.columns = df.columns.str.strip()
     G = nx.Graph()
-
     for _, row in df.iterrows():
         origen = normaliza(row['origen'])
         destino = normaliza(row['destino'])
         distancia = float(row['distancia(km)'])
         eta = float(row['ETA(min)'])
-        
-        # Soporte para 'flujo (und)' si existe la columna
-        if 'flujo (und)' in df.columns:
-            try:
-                flujo = float(row['flujo (und)'])
-            except Exception:
-                flujo = None
-            G.add_edge(origen, destino, distancia=distancia, eta=eta, flujo=flujo)
-        else:
-            G.add_edge(origen, destino, distancia=distancia, eta=eta)
-    # Asignar coordenadas a los nodos
+        G.add_edge(origen, destino, distancia=distancia, eta=eta)
+    # --- ASIGNAR COORDENADAS ---
     for n in G.nodes:
         nodo = normaliza(n)
-        if nodo in [normaliza(k) for k in COORDS.keys()]:
-            key = [k for k in COORDS if normaliza(k) == nodo][0]
-            G.nodes[n]['pos'] = COORDS[key]
-        else:
+        found = False
+        for k in COORDS:
+            if normaliza(k) == nodo:
+                G.nodes[n]['pos'] = COORDS[k]
+                found = True
+                break
+        if not found:
             G.nodes[n]['pos'] = (0, 0)
     return G
 
+
+def cargar_grafo_flujo(csv_path):
+    with open(csv_path, encoding='latin1') as f:
+        primer_linea = f.readline()
+        sep = '\t' if '\t' in primer_linea else ';'
+    df = pd.read_csv(csv_path, sep=sep, encoding='latin1')
+    df.columns = df.columns.str.strip()
+    G = nx.DiGraph()
+    for _, row in df.iterrows():
+        origen = normaliza(row['origen'])
+        destino = normaliza(row['destino'])
+        distancia = float(row['distancia(km)'])
+        eta = float(row['ETA(min)'])
+        flujo = float(row['flujo (und)']) if 'flujo (und)' in df.columns else 0
+        G.add_edge(origen, destino, distancia=distancia, eta=eta, capacity=flujo)
+    # --- ASIGNAR COORDENADAS ---
+    for n in G.nodes:
+        nodo = normaliza(n)
+        found = False
+        for k in COORDS:
+            if normaliza(k) == nodo:
+                G.nodes[n]['pos'] = COORDS[k]
+                found = True
+                break
+        if not found:
+            G.nodes[n]['pos'] = (0, 0)
+    return G
+
+
+# ----------- Resto de utilidades iguales -----------
 def info_nodos(G):
     print("NODOS EN EL GRAFO:")
     for nodo in G.nodes():

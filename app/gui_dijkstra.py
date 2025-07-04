@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from models.graph_logic import calcular_todos_caminos_dijkstra
+from models.graph_logic import calcular_caminos_a_todos
 
 import matplotlib
 matplotlib.use('TkAgg')
@@ -75,7 +75,7 @@ class GrafoDijkstraApp(tk.Tk):
             messagebox.showwarning("Advertencia", "Debes seleccionar un nodo de origen.")
             return
 
-        distancias, caminos, tiempos, algoname = calcular_todos_caminos_dijkstra(self.G, origen)
+        distancias, caminos, tiempos, algoname = calcular_caminos_a_todos(self.G, origen)
         self.resultado.configure(state="normal")
         self.resultado.delete(1.0, tk.END)
         self.resultado.insert(tk.END, f"{'Destino':<25} {'Distancia (km)':>18} {'Tiempo (min)':>15}\n")
@@ -99,10 +99,25 @@ class GrafoDijkstraApp(tk.Tk):
             for i in range(len(path)-1):
                 u, v = path[i], path[i+1]
                 edges_en_camino.add(tuple(sorted((u, v))))
-        pos = nx.kamada_kawai_layout(self.G, scale=3)
-        nx.draw_networkx_nodes(self.G, pos, ax=self.ax, node_color=[
-            "orange" if n == origen else "skyblue" for n in self.G.nodes()
-        ], node_size=650)
+        # ==== USAR COORDENADAS REALES DE LOS NODOS ====
+        try:
+            pos = {
+                n: (self.G.nodes[n]['pos'][1], self.G.nodes[n]['pos'][0])
+                for n in self.G.nodes if self.G.nodes[n]['pos'] != (0,0)
+            }
+            for n in self.G.nodes:
+                if self.G.nodes[n]['pos'] == (0,0):
+                    pos[n] = (0,0)
+        except Exception as e:
+            print("Error en posiciones de nodos:", e)
+            pos = nx.spring_layout(self.G)
+        # ==============================================
+
+        nx.draw_networkx_nodes(
+            self.G, pos, ax=self.ax,
+            node_color=["orange" if n == origen else "skyblue" for n in self.G.nodes()],
+            node_size=650
+        )
         nx.draw_networkx_labels(self.G, pos, ax=self.ax, font_size=10, font_family="DejaVu Sans")
         edge_colors = [
             "red" if tuple(sorted((u, v))) in edges_en_camino else "grey"

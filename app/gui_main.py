@@ -154,19 +154,19 @@ class MainApp(tk.Tk):
 
         if alg == "Dijkstra":
             self.destroy()
-            import app.gui_dijkstra as djk
+            import app.gui_caminocorto.gui_dijkstra as djk
             djk.GrafoDijkstraApp(self.G, self.nodos).mainloop()
         elif alg == "Bellman-Ford":
             self.destroy()
-            import app.gui_bellman as blm
+            import app.gui_caminocorto.gui_bellman as blm
             blm.GrafoBellmanApp(self.G, self.nodos).mainloop()
         elif alg == "A* (A-Star)":
             self.destroy()
-            import app.gui_astar as ast
+            import app.gui_caminocorto.gui_astar as ast
             ast.GrafoAStarApp(self.G, self.nodos).mainloop()
         elif alg == "Floyd-Warshall":
             self.destroy()
-            import app.gui_floyd as flw
+            import app.gui_caminocorto.gui_floyd as flw
             flw.GrafoFloydApp(self.G, self.nodos).mainloop()
         else:
             messagebox.showinfo("En desarrollo", f"La funcionalidad '{alg}' estará disponible próximamente.")
@@ -188,7 +188,7 @@ class MainApp(tk.Tk):
             return
         
         self.destroy()
-        import app.gui_FordF as ff
+        import app.gui_flujomaximo.gui_FordF as ff
         ff.GrafoFordFulkersonApp(self.G, self.nodos).mainloop()
 
 if __name__ == "__main__":

@@ -101,14 +101,24 @@ class GrafoAStarApp(tk.Tk):
 
     def visualizar_camino(self, path, origen, destino):
         self.ax.clear()
-        pos = nx.kamada_kawai_layout(self.G, scale=3)
         edges_en_camino = set()
-
         if path:
             for i in range(len(path)-1):
                 u, v = path[i], path[i+1]
                 edges_en_camino.add(tuple(sorted((u, v))))
-
+        # --- Usar coordenadas reales si existen ---
+        try:
+            pos = {
+                n: (self.G.nodes[n]['pos'][1], self.G.nodes[n]['pos'][0])
+                for n in self.G.nodes if self.G.nodes[n]['pos'] != (0,0)
+            }
+            for n in self.G.nodes:
+                if self.G.nodes[n]['pos'] == (0,0):
+                    pos[n] = (0,0)
+        except Exception as e:
+            print("Error en posiciones de nodos:", e)
+            pos = nx.spring_layout(self.G)
+        # ------------------------------------------
         nx.draw_networkx_nodes(self.G, pos, ax=self.ax, node_color=[
             "orange" if n == origen else ("green" if n == destino else "skyblue") for n in self.G.nodes()
         ], node_size=650)

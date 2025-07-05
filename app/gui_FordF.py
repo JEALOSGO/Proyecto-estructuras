@@ -44,20 +44,16 @@ class GrafoFordFulkersonApp(tk.Tk):
         self.left = tk.Frame(self.container)
         self.left.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
 
-        # Selección de nodo fuente
         ttk.Label(self.left, text="Selecciona Nodo Fuente:").pack(pady=(20,5), fill=tk.X)
         self.combo_fuente = ttk.Combobox(self.left, values=self.nodos, state="readonly")
         self.combo_fuente.pack(fill=tk.X)
 
-        # Selección de nodo sumidero
         ttk.Label(self.left, text="Selecciona Nodo Sumidero:").pack(pady=(10,5), fill=tk.X)
         self.combo_sumidero = ttk.Combobox(self.left, values=self.nodos, state="readonly")
         self.combo_sumidero.pack(fill=tk.X)
 
-        # Botón para calcular flujo máximo
         ttk.Button(self.left, text="Calcular Flujo Máximo (Ford-Fulkerson)", command=self.calcular_flujo_maximo).pack(pady=20, fill=tk.X)
 
-        # Área de resultados
         self.resultado = tk.Text(self.left, height=28, width=43, state="disabled")
         self.resultado.pack(pady=10, fill=tk.BOTH, expand=True)
 
@@ -93,13 +89,11 @@ class GrafoFordFulkersonApp(tk.Tk):
             messagebox.showwarning("Advertencia", "El nodo fuente y sumidero deben ser diferentes.")
             return
 
-        # Validar el grafo
         errors = validate_flow_graph(self.G, fuente, sumidero)
         if errors:
             messagebox.showerror("Error de validación", "\n".join(errors))
             return
 
-        # Calcular flujo máximo
         self.resultado_flujo = find_max_flow_paths(self.G, fuente, sumidero)
 
         if 'error' in self.resultado_flujo:
@@ -113,16 +107,11 @@ class GrafoFordFulkersonApp(tk.Tk):
         self.resultado.configure(state="normal")
         self.resultado.delete(1.0, tk.END)
 
-        # Encabezado
         self.resultado.insert(tk.END, f"FLUJO MÁXIMO: {fuente} → {sumidero}\n")
         self.resultado.insert(tk.END, "=" * 58 + "\n\n")
-
-        # Flujo máximo total
         flujo_maximo = self.resultado_flujo['max_flow']
         self.resultado.insert(tk.END, f"Flujo Máximo Total: {flujo_maximo:.2f} unidades\n")
         self.resultado.insert(tk.END, f"Caminos de aumento encontrados: {len(self.resultado_flujo['flow_paths'])}\n\n")
-
-        # Mostrar caminos de aumento
         self.resultado.insert(tk.END, "CAMINOS DE AUMENTO:\n")
         self.resultado.insert(tk.END, "-" * 58 + "\n")
 
@@ -132,14 +121,13 @@ class GrafoFordFulkersonApp(tk.Tk):
             self.resultado.insert(tk.END, f"{i}. {' → '.join(path)}\n")
             self.resultado.insert(tk.END, f"   Flujo: {flow:.2f} unidades\n\n")
 
-        # Mostrar utilización de aristas
         self.resultado.insert(tk.END, "UTILIZACIÓN DE ARISTAS:\n")
         self.resultado.insert(tk.END, "-" * 58 + "\n")
         self.resultado.insert(tk.END, f"{'Arista':<20} {'Flujo/Cap':>15} {'Utilización':>15}\n")
         self.resultado.insert(tk.END, "-" * 58 + "\n")
 
         for (u, v), flow_data in self.resultado_flujo['edge_flows'].items():
-            if flow_data['flow'] > 0:  # Solo mostrar aristas con flujo
+            if flow_data['flow'] > 0:
                 arista = f"{u} → {v}"
                 flujo_cap = f"{flow_data['flow']:.1f}/{flow_data['capacity']:.1f}"
                 utilizacion = f"{flow_data['utilization']:.1f}%"
@@ -152,7 +140,7 @@ class GrafoFordFulkersonApp(tk.Tk):
         # ====== USAR COORDENADAS REALES DE LOS NODOS SI EXISTEN ======
         try:
             pos = {
-                n: (self.G.nodes[n]['pos'][1], self.G.nodes[n]['pos'][0])
+                n: (self.G.nodes[n].get('pos', (0, 0))[1], self.G.nodes[n].get('pos', (0, 0))[0])
                 for n in self.G.nodes if self.G.nodes[n].get('pos', (0, 0)) != (0,0)
             }
             for n in self.G.nodes:
@@ -163,7 +151,6 @@ class GrafoFordFulkersonApp(tk.Tk):
             pos = nx.spring_layout(self.G)
         # =============================================================
 
-        # Colores de nodos
         node_colors = []
         for n in self.G.nodes():
             if n == fuente:
@@ -173,18 +160,13 @@ class GrafoFordFulkersonApp(tk.Tk):
             else:
                 node_colors.append("skyblue")
 
-        # Dibujar nodos
         nx.draw_networkx_nodes(self.G, pos, ax=self.ax, node_color=node_colors, node_size=650)
         nx.draw_networkx_labels(self.G, pos, ax=self.ax, font_size=10, font_family="DejaVu Sans")
 
-        # Dibujar aristas con diferentes grosores y colores según el flujo
         for (u, v), flow_data in self.resultado_flujo['edge_flows'].items():
             if flow_data['flow'] > 0:
-                # Grosor proporcional al flujo
                 max_flow = max(1, self.resultado_flujo['max_flow'])
                 width = max(2, (flow_data['flow'] / max_flow) * 8)
-
-                # Color según utilización
                 utilization = flow_data['utilization']
                 if utilization >= 90:
                     color = "red"
@@ -194,15 +176,12 @@ class GrafoFordFulkersonApp(tk.Tk):
                     color = "blue"
                 else:
                     color = "green"
-
                 nx.draw_networkx_edges(self.G, pos, edgelist=[(u, v)], ax=self.ax,
                                      width=width, edge_color=color, alpha=0.8)
             else:
-                # Aristas sin flujo en gris claro
                 nx.draw_networkx_edges(self.G, pos, edgelist=[(u, v)], ax=self.ax,
                                      width=1, edge_color="lightgray", alpha=0.3)
 
-        # Etiquetas de flujo en las aristas
         edge_labels = {}
         for (u, v), flow_data in self.resultado_flujo['edge_flows'].items():
             if flow_data['flow'] > 0:
@@ -210,7 +189,6 @@ class GrafoFordFulkersonApp(tk.Tk):
 
         nx.draw_networkx_edge_labels(self.G, pos, edge_labels, ax=self.ax, font_size=6, font_family="DejaVu Sans")
 
-        # Título
         self.ax.set_title(f"Flujo Máximo: {fuente} → {sumidero} = {self.resultado_flujo['max_flow']:.2f} unidades",
                          fontsize=18, fontfamily="DejaVu Sans")
         self.ax.axis('off')
@@ -224,7 +202,7 @@ class GrafoFordFulkersonApp(tk.Tk):
 
 if __name__ == "__main__":
     import networkx as nx
-    G = nx.DiGraph()  # ¡OJO! DiGraph para flujo máximo dirigido
+    G = nx.DiGraph()
     nodos = []
     app = GrafoFordFulkersonApp(G, nodos)
     app.mainloop()

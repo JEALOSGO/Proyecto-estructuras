@@ -128,7 +128,9 @@ def cargar_grafo_flujo(csv_path):
         distancia = float(row['distancia(km)'])
         eta = float(row['ETA(min)'])
         flujo = float(row['flujo (und)']) if 'flujo (und)' in df.columns else 150
+
         G.add_edge(origen, destino, distancia=distancia, eta=eta, capacity=flujo)
+
     # --- ASIGNAR COORDENADAS ---
     for n in G.nodes:
         nodo = normaliza(n)

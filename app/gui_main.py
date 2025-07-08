@@ -176,14 +176,18 @@ class MainApp(tk.Tk):
 
     def ir_flujo(self):
         alg = self.algoritmos_flujo.get()
+
         if self.GD is None:
+
             messagebox.showwarning("Error", "Debe cargar un grafo primero")
             return
         
         if alg == "Ford-Fulkerson":
             self.withdraw()  # Ocultar ventana principal
             from app.gui_flujomaximo.gui_FordF import GrafoFordFulkersonApp
+
             ford_window = GrafoFordFulkersonApp(self, self.GD, self.nodos)
+
             ford_window.protocol("WM_DELETE_WINDOW", lambda: self._on_child_close(ford_window))
         else:
             messagebox.showinfo("En desarrollo", f"Algoritmo {alg} no implementado aún")
